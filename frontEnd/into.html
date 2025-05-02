@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAY-LIST-LEARN</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .content {
+            margin-top: 100px; /* To push content below nav */
+            text-align: left;
+            padding-left: 50px; /* Little left padding */
+        }
+
+        #title {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: rgb(0, 0, 0);
+        }
+
+        #solgan {
+            font-size: 24px;
+            color: gray;
+        }
+        .button {
+            padding: 10px 20px; /* padding: top-bottom 10px, left-right 20px */
+            background-color: #f5f5f5; /* light background */
+            color: #000; /* black text */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background-color: rgb(7, 119, 247); /* blue background on hover */
+            color: white; /* white text on hover */
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li>Home</li>
+            <li>List</li>
+            <li>Explore</li>
+            <li>Profile & Settings</li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <h1 id="title">SLAY-LIST-LEARN</h1>
+        <p id="solgan">Slay Your Goals. Learn Your Way...</p>
+    </div>
+    <button class="button" onclick="window.location.href='registration.html';">Get Started!!!</button>
+
+</body>
+</html>

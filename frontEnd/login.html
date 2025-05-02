@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLL-Login</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, rgb(61, 230, 173) 50%, rgb(255, 165, 0) 50%);
+            justify-content: center;
+            align-items: center;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        #title {
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 50px; 
+            color: white; 
+            text-align: center; 
+            position: absolute; 
+            top: 20px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            animation: typing 2s steps(40) 1s forwards, blink 0.75s step-end infinite; 
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #fcf8f8;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #030303;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #fcfdff;
+            color: black;
+            transition: 1.5s
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">SLAY-LIST-LEARN</h1><br>
+
+    <div class="login-container">
+        <h2>LOGIN PAGE</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">EMAIL:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">PASSWORD:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">LOGIN</button>
+        </form>
+        <p>Don't have an account? <a href="registration.html">Register here</a></p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent page reload on form submission
+    
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+    
+            const loginData = {
+                email: username,
+                password: password
+            };
+    
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    alert('Login successful!');
+                    localStorage.setItem('username', data.username); // Save username
+                    localStorage.setItem('userId', data.userId);     // Save user ID
+                    window.location.href = '/front';
+                } else {
+                    alert('Login failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while logging in.');
+            }
+        });
+    </script>
+</body>
+</html>

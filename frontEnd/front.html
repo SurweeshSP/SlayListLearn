@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlayListLearn Todo App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #000;
+            --secondary-color: #333;
+            --background-color: #fff;
+            --light-gray: #f0f0f0;
+            --medium-gray: #e0e0e0;
+            --border-color: #ddd;
+            --accent-color: #1c99e6;
+            --accent-hover: #157ac0;
+            --todo-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --todo-hover-bg: #f9f9f9;
+            --completed-color: #4CAF50;
+            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary-color: #f8f8f8;
+            --secondary-color: #b0b0b0;
+            --background-color: #121212;
+            --light-gray: #222;
+            --medium-gray: #333;
+            --border-color: #444;
+            --accent-color: #3db4ff;
+            --accent-hover: #5bc2ff;
+            --todo-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            --todo-hover-bg: #1e1e1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--accent-color), #9c27b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: none;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        .dark-mode-toggle i {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        nav {
+            display: flex;
+            margin-bottom: 25px;
+            border-radius: var(--radius);
+            background-color: var(--light-gray);
+            overflow: hidden;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: var(--medium-gray);
+        }
+
+        .nav-item.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .new-todo {
+            display: flex;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: var(--radius);
+            background-color: var(--light-gray);
+            box-shadow: var(--todo-shadow);
+        }
+
+        .new-todo input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            padding: 8px;
+            color: var(--primary-color);
+        }
+
+        .new-todo input:focus {
+            outline: none;
+        }
+
+        .visibility-select {
+            margin-left: 10px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .post-btn {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .post-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        .post-btn:disabled {
+            background-color: var(--medium-gray);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .todo-list {
+            margin-top: 20px;
+        }
+
+        .todo-item {
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--background-color);
+            box-shadow: var(--todo-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: var(--todo-hover-bg);
+        }
+
+        .todo-item.completed .todo-content {
+            text-decoration: line-through;
+            color: var(--secondary-color);
+        }
+
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .todo-author {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .todo-timestamp {
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+
+        .todo-content {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 20px;
+            color: var(--secondary-color);
+            font-size: 14px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 5px;
+        }
+
+        .todo-action {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .todo-action:hover {
+            color: var(--accent-color);
+            background-color: var(--light-gray);
+        }
+
+        .todo-action i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .todo-action-complete.completed {
+            color: var(--completed-color);
+        }
+
+        .todo-comments {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: var(--radius);
+            background-color: var(--light-gray);
+        }
+
+        .comment {
+            padding: 10px;
+            font-size: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 8px;
+            background-color: var(--background-color);
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-right: 5px;
+            color: var(--accent-color);
+        }
+
+        .new-comment {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .new-comment input {
+            flex-grow: 1;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            padding: 10px 15px;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+        }
+
+        .new-comment input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .visibility-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .visibility-badge.public {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .visibility-badge.private {
+            background-color: #ffebee;
+            color: #b71c1c;
+        }
+
+        .dark-mode .visibility-badge.public {
+            background-color: #0d47a1;
+            color: #e3f2fd;
+        }
+
+        .dark-mode .visibility-badge.private {
+            background-color: #b71c1c;
+            color: #ffebee;
+        }
+
+        .no-todos {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary-color);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+        }
+
+        .no-todos i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 22px;
+            }
+            
+            .todo-actions {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .new-todo {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .visibility-select, .post-btn {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SlayListLearn</h1>
+            <div class="header-actions">
+                <div class="dark-mode-toggle" id="dark-mode-toggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="profile-icon">U</div>
+            </div>
+        </header>
+
+        <nav>
+            <div class="nav-item active" data-view="all">All</div>
+            <div class="nav-item" data-view="public">Public</div>
+            <div class="nav-item" data-view="private">Private</div>
+        </nav>
+
+        <div class="new-todo">
+            <input type="text" id="new-todo-input" placeholder="What do you want to accomplish?">
+            <select class="visibility-select" id="visibility-select">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select>
+            <button class="post-btn" id="post-btn" disabled>Post</button>
+        </div>
+
+        <div class="todo-list" id="todo-list">
+            <!-- Todo items will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        // User data (normally would come from authentication)
+        const currentUser = {
+            id: 'user1',
+            username: 'CurrentUser',
+            displayName: 'Current User'
+        };
+
+        // Initial data
+        let todos = [
+            {
+                id: 1,
+                userId: 'user1',
+                author: 'CurrentUser',
+                content: 'Finish the Threads-inspired TODO app',
+                timestamp: new Date('2025-04-30T10:00:00'),
+                visibility: 'public',
+                completed: false,
+                likes: 2,
+                comments: [
+                    { userId: 'user2', author: 'Jane', content: 'Looking forward to seeing it!', timestamp: new Date('2025-04-30T10:05:00') }
+                ]
+            },
+            {
+                id: 2,
+                userId: 'user1',
+                author: 'CurrentUser',
+                content: 'Go grocery shopping this evening',
+                timestamp: new Date('2025-04-30T09:30:00'),
+                visibility: 'private',
+                completed: false,
+                likes: 0,
+                comments: []
+            },
+            {
+                id: 3,
+                userId: 'user2',
+                author: 'Jane',
+                content: 'Prepare presentation for tomorrow',
+                timestamp: new Date('2025-04-30T08:45:00'),
+                visibility: 'public',
+                completed: true,
+                likes: 5,
+                comments: [
+                    { userId: 'user1', author: 'CurrentUser', content: 'Need any help with that?', timestamp: new Date('2025-04-30T09:00:00') },
+                    { userId: 'user2', author: 'Jane', content: 'All good, thanks for offering!', timestamp: new Date('2025-04-30T09:10:00') }
+                ]
+            }
+        ];
+
+        // DOM elements
+        const todoList = document.getElementById('todo-list');
+        const newTodoInput = document.getElementById('new-todo-input');
+        const visibilitySelect = document.getElementById('visibility-select');
+        const postBtn = document.getElementById('post-btn');
+        const navItems = document.querySelectorAll('.nav-item');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        // Current view state
+        let currentView = 'all';
+        
+        // Check user preference for dark mode
+        const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let isDarkMode = localStorage.getItem('darkMode') === 'true' || prefersDarkMode;
+
+        // Initialize the app
+        function init() {
+            // Initialize dark mode
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            renderTodos();
+            setupEventListeners();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Enable/disable post button based on input
+            newTodoInput.addEventListener('input', () => {
+                postBtn.disabled = newTodoInput.value.trim() === '';
+            });
+
+            // Post new todo
+            postBtn.addEventListener('click', addNewTodo);
+
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    currentView = e.target.dataset.view;
+                    // Update active class
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderTodos();
+                });
+            });
+
+            // Event delegation for todo item actions
+            todoList.addEventListener('click', handleTodoActions);
+            
+            // Dark mode toggle
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            
+            // Update the icon
+            darkModeToggle.innerHTML = isDarkMode 
+                ? '<i class="fas fa-sun"></i>' 
+                : '<i class="fas fa-moon"></i>';
+                
+            // Save preference
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Handle todo item actions (complete, like, comment)
+        function handleTodoActions(e) {
+            const target = e.target;
+            const todoAction = target.closest('.todo-action');
+            
+            if (!todoAction) return;
+            
+            const todoId = parseInt(todoAction.closest('.todo-item').dataset.id);
+            
+            // Check if complete action
+            if (todoAction.classList.contains('todo-action-complete')) {
+                toggleTodoComplete(todoId);
+                return;
+            }
+
+            // Check if like action
+            if (todoAction.classList.contains('todo-action-like')) {
+                toggleTodoLike(todoId);
+                return;
+            }
+
+            // Check if comment action (this just focuses the comment input)
+            if (todoAction.classList.contains('todo-action-comment')) {
+                const todoItem = todoAction.closest('.todo-item');
+                const commentInput = todoItem.querySelector('.new-comment-input');
+                if (commentInput) {
+                    commentInput.focus();
+                }
+                return;
+            }
+        }
+
+        // Toggle todo complete status
+        function toggleTodoComplete(todoId) {
+            const todo = todos.find(todo => todo.id === todoId);
+            if (todo) {
+                todo.completed = !todo.completed;
+                renderTodos();
+            }
+        }
+
+        // Toggle todo like
+        function toggleTodoLike(todoId) {
+            const todo = todos.find(todo => todo.id === todoId);
+            if (todo) {
+                todo.likes += 1;
+                renderTodos();
+            }
+        }
+
+        // Add new todo
+        function addNewTodo() {
+            const content = newTodoInput.value.trim();
+            if (content === '') return;
+
+            const newTodo = {
+                id: todos.length + 1,
+                userId: currentUser.id,
+                author: currentUser.username,
+                content: content,
+                timestamp: new Date(),
+                visibility: visibilitySelect.value,
+                completed: false,
+                likes: 0,
+                comments: []
+            };
+
+            todos.unshift(newTodo);
+            newTodoInput.value = '';
+            postBtn.disabled = true;
+            renderTodos();
+        }
+
+        // Add comment to todo
+        function addComment(todoId, commentText) {
+            const todo = todos.find(todo => todo.id === todoId);
+            if (todo && commentText.trim() !== '') {
+                const newComment = {
+                    userId: currentUser.id,
+                    author: currentUser.username,
+                    content: commentText.trim(),
+                    timestamp: new Date()
+                };
+                todo.comments.push(newComment);
+                renderTodos();
+            }
+        }
+
+        // Filter todos based on current view
+        function getFilteredTodos() {
+            switch (currentView) {
+                case 'public':
+                    return todos.filter(todo => todo.visibility === 'public');
+                case 'private':
+                    return todos.filter(todo => todo.visibility === 'private' && todo.userId === currentUser.id);
+                case 'all':
+                default:
+                    return todos.filter(todo => todo.visibility === 'public' || todo.userId === currentUser.id);
+            }
+        }
+
+        // Format timestamp
+        function formatTimestamp(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+
+            return date.toLocaleDateString();
+        }
+
+        // Render todos to DOM
+        function renderTodos() {
+            const filteredTodos = getFilteredTodos();
+            
+            if (filteredTodos.length === 0) {
+                todoList.innerHTML = `
+                    <div class="no-todos">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No todos found in this category.</p>
+                        <p>Add a new task to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            todoList.innerHTML = '';
+
+            filteredTodos.forEach(todo => {
+                const todoElement = document.createElement('div');
+                todoElement.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                todoElement.dataset.id = todo.id;
+
+                const todoContent = `
+                    <div class="todo-header">
+                        <span class="todo-author">${todo.author}
+                            <span class="visibility-badge ${todo.visibility}">${todo.visibility}</span>
+                        </span>
+                        <span class="todo-timestamp">${formatTimestamp(todo.timestamp)}</span>
+                    </div>
+                    <div class="todo-content">${todo.content}</div>
+                    <div class="todo-actions">
+                        <div class="todo-action todo-action-complete ${todo.completed ? 'completed' : ''}">
+                            <i class="fas ${todo.completed ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            ${todo.completed ? 'Completed' : 'Complete'}
+                        </div>
+                        <div class="todo-action todo-action-like">
+                            <i class="fas fa-heart"></i>
+                            ${todo.likes}
+                        </div>
+                        <div class="todo-action todo-action-comment">
+                            <i class="fas fa-comment"></i>
+                            ${todo.comments.length}
+                        </div>
+                    </div>
+                `;
+
+                todoElement.innerHTML = todoContent;
+
+                // Add comments section
+                if (todo.comments.length > 0 || true) { // Always show comments section for now
+                    const commentsSection = document.createElement('div');
+                    commentsSection.className = 'todo-comments';
+                    
+                    // Add existing comments
+                    todo.comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+                        commentElement.innerHTML = `
+                            <span class="comment-author">${comment.author}:</span>
+                            <span class="comment-content">${comment.content}</span>
+                        `;
+                        commentsSection.appendChild(commentElement);
+                    });
+
+                    const newCommentSection = document.createElement('div');
+                    newCommentSection.className = 'new-comment';
+                    newCommentSection.innerHTML = `
+                        <input type="text" class="new-comment-input" placeholder="Add a comment...">
+                    `;
+                    
+                    const commentInput = newCommentSection.querySelector('.new-comment-input');
+                    commentInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            addComment(todo.id, e.target.value);
+                            e.target.value = '';
+                        }
+                    });
+                    
+                    commentsSection.appendChild(newCommentSection);
+                    todoElement.appendChild(commentsSection);
+                }
+
+                todoList.appendChild(todoElement);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
